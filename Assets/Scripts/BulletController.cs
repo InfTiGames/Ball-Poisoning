@@ -1,10 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BulletController : MonoBehaviour
 {
     public static BulletController singleton { get; private set; }
+
+    private float _explosionRadius;
 
     private void Awake()
     {
@@ -15,20 +15,33 @@ public class BulletController : MonoBehaviour
     {
         if (other.TryGetComponent(out EnemiesController enemy))
         {
+            Destroy(gameObject);            
+        }
+
+        if (other.TryGetComponent(out Finish door))
+        {
             Destroy(gameObject);
-            Destroy(other.gameObject);
         }
     }
 
-    // Start is called before the first frame update
-    private void Start()
+    private void OnDestroy()
     {
-        
+        _explosionRadius = transform.localScale.x + 0.5f;
+        Collider[] collider = Physics.OverlapSphere(transform.position, _explosionRadius);
+        if (collider.Length > 0)
+        {
+            foreach (Collider col in collider)
+            {
+                if (col.TryGetComponent(out EnemiesController enemiess))
+                {
+                    DamageEnemy(enemiess.transform);                
+                }
+            }
+        }
     }
 
-    // Update is called once per frame
-    private void Update()
+    private void DamageEnemy(Transform enemy)
     {
-        
+        Destroy(enemy.gameObject);
     }
 }
