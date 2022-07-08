@@ -6,8 +6,7 @@ public class GameManager : MonoBehaviour
     public bool IsGameActive;
     [SerializeField] private GameObject _gameOverPanel;
     [SerializeField] private GameObject _winGamePanel;
-    private PlayerController _player;
-    public GameObject _goButton;
+    private PlayerController _player;   
 
     public static GameManager singleton { get; private set; }
 
@@ -24,8 +23,7 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         IsGameActive = true;    
-        _player.SizeBar.gameObject.SetActive(true);
-        _goButton.SetActive(true);
+        _player.SizeBar.gameObject.SetActive(true);        
     }
 
     public void GameOver()
@@ -43,8 +41,7 @@ public class GameManager : MonoBehaviour
     private void SetUI()
     {
         IsGameActive = false;
-        _player.SizeBar.gameObject.SetActive(false);
-        _goButton.SetActive(false);
+        _player.SizeBar.gameObject.SetActive(false);       
     }
 
     public void RestartGame()

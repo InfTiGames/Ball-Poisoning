@@ -2,28 +2,37 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(SphereCollider))]
+
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController singleton { get; private set; }
-    //    Добавь звуки
-    //    Эффекты
-    //Пускай луч от шара до финиша проверяющий если нет на пути препядствий, тогда делай кнопку мигающей или эффектов добавь
-    //Переделай основную механику
-    //По коду сделай обджект пул, и адекватно используй синглтон
-    //Рефакторинг
+
+    //// Добавь звуки
+    //// Эффекты
+    
+    ////// Пускай луч от шара до финиша проверяющий если нет на пути препядствий, тогда делай кнопку мигающей или эффектов добавь
+    ////// Переделай основную механику
+
+    // По коду сделай обджект пул, и адекватно используй синглтон
+    // Рефакторинг
+
+    //Небольшие анимации передвижения шарика, и анимация взрыва пули и смерти преград
 
     public SizeBar SizeBar;
     [SerializeField] private float _currentSize;
-    private static float _maxSize = 3.6f;   
+    private static float _maxSize = 3.6f;  
 
     [SerializeField] private GameObject _bulletPrefab;
     private GameObject _bullet;
-    private Transform _finish;
+    public Transform _finish;
     private Vector3 _scaleFactor = new Vector3(0.4f, 0.4f, 0.4f);
-    private Vector3 _bulletSpawnPosition = new Vector3(1.4f, 1.5f, 4.5f);
-    private bool _isClicked;
-    private bool _canMove;
+    [SerializeField] private Transform _bulletPosition;
+    private bool _isClicked;    
     private float _minimalSize = 1f;
+
+    float radius;
+
 
     GameManager _gameManager;    
 
@@ -38,10 +47,12 @@ public class PlayerController : MonoBehaviour
         _gameManager = GameManager.singleton;
         _currentSize = _maxSize;
         SizeBar.SetMaxSize(_maxSize);
+        transform.rotation = Quaternion.LookRotation(_finish.position);
     }
 
     private void FixedUpdate()
     {
+        radius = transform.localScale.x;
         if (_gameManager.IsGameActive == true)
         {
             if (_isClicked)
@@ -54,15 +65,9 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                MoveBullet();
-            }
-            MoveToFinish();
+                MoveBullet();                
+            }           
         }
-    }
-
-    public void SetTrueForMove()
-    {
-        _canMove = true;
     }
 
     private void GameChanges()
@@ -81,12 +86,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void MoveToFinish()
+    public void MoveToFinish()
     {
-        if (_canMove)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, _finish.position, 10f * Time.fixedDeltaTime);
-        }
+        transform.position = Vector3.MoveTowards(transform.position, _finish.position, 5f * Time.fixedDeltaTime);    
     }
 
     private void OnMouseDown()
@@ -94,7 +96,7 @@ public class PlayerController : MonoBehaviour
         if (_bullet == null && _gameManager.IsGameActive == true)
         {
             _isClicked = true;
-            _bullet = Instantiate(_bulletPrefab, _bulletSpawnPosition, Quaternion.identity);
+            _bullet = Instantiate(_bulletPrefab, _bulletPosition.position, Quaternion.identity);
         }
     }
 
