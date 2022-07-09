@@ -1,44 +1,43 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public static PlayerController singleton { get; private set; }
-    
-    //// Эффекты   
+    public static PlayerController Singleton { get; private set; }
 
-    // По коду сделай обджект пул, и адекватно используй синглтон
-    // Рефакторинг
+    [SerializeField] LayerMask _obstacleMask;
 
-    //Небольшие анимации передвижения шарика, и анимация взрыва пули и смерти преград
+    enum State { idle, move, finish }
+    State _state;
 
+    #region SizeBarFields
     [SerializeField] SizeBar _sizeBar;
     [SerializeField] float _currentSize;
-    static float _maxSize = 3.6f;  
-
-    [SerializeField] GameObject _bulletPrefab;
-    GameObject _bullet;
-    Transform _finish;
+    static float _maxSize = 3.6f;
+    float _minimalSize = 1f;
     Vector3 _scaleFactor;
-    [SerializeField] Transform _bulletPosition;
-    bool _isClicked;    
-    float _minimalSize = 1f;      
-    [SerializeField] LayerMask _obstacleMask;
-    GameManager _gameManager;
+    #endregion
 
+    #region BulletFields
+    [SerializeField] GameObject _bulletPrefab;
+    [SerializeField] Transform _bulletPosition;
+    GameObject _bullet;
+    #endregion
+
+    Transform _finish;  
+    bool _isClicked;   
+    GameManager _gameManager;
     Animator _animator;
 
     void Awake()
     {
-        singleton = this;
+        Singleton = this;
     }
 
     void Start()
     {
         _animator = GetComponentInParent<Animator>();
-        _finish = Finish.singleton.transform;
-        _gameManager = GameManager.singleton;
+        _finish = Finish.Singleton.transform;
+        _gameManager = GameManager.Singleton;
         _currentSize = _maxSize;
         _sizeBar.SetMaxSize(_maxSize);
         transform.rotation = Quaternion.LookRotation(_finish.position);
@@ -46,9 +45,11 @@ public class PlayerController : MonoBehaviour
     }
 
     void FixedUpdate()
-    {       
+    {
+        _animator.SetInteger(nameof(State), (int)_state);
         if (_gameManager.IsGameActive == true)
         {
+            
             if (_isClicked)
             {
                 GameChanges();
@@ -74,14 +75,17 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            _animator.SetBool("Moving", false);
+            _state = State.idle;
         }
     }
 
     void GameChanges()
     {
         transform.localScale -= _scaleFactor / 2 * Time.fixedDeltaTime;
-        _bullet.transform.localScale += _scaleFactor * Time.fixedDeltaTime;
+        if (_bullet != null)
+        {
+            _bullet.transform.localScale += _scaleFactor * Time.fixedDeltaTime;
+        }       
         _currentSize -= _scaleFactor.x / 2 * Time.fixedDeltaTime;
         _sizeBar.SetSize(_currentSize);        
     }
@@ -97,17 +101,12 @@ public class PlayerController : MonoBehaviour
     void MoveToFinish()
     {
         transform.position = Vector3.MoveTowards(transform.position, _finish.position, 5f * Time.fixedDeltaTime);
-        _animator.SetBool("Moving", true);
-
-        if (Vector3.Distance(transform.position, _finish.position) <= 5f)
-        {
-
-        }
+        _state = State.move;
     }
 
     void OnMouseDown()
     {
-        if (_bullet == null && _gameManager.IsGameActive == true)
+        if (_bullet == null && _gameManager.IsGameActive == true && _state != State.move)
         {
             _isClicked = true;
             _bullet = Instantiate(_bulletPrefab, _bulletPosition.position, Quaternion.identity);            
@@ -121,7 +120,7 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.TryGetComponent(out EnemiesController enemy))
+        if (other.gameObject.TryGetComponent(out ObstacleControl obstacle))
         {
             gameObject.SetActive(false);
             _gameManager.GameOver();
@@ -130,6 +129,7 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.TryGetComponent(out Finish door))
         {
             _gameManager.WinGame();
+            _state = State.finish;            
             return;
         }
     }

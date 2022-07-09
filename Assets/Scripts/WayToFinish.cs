@@ -2,32 +2,34 @@ using UnityEngine;
 
 public class WayToFinish : MonoBehaviour
 {
-    Transform _player;
-    Transform _finish;
+    Transform _player;    
     LineRenderer _way;
     float _width;
-    Vector3 zPos;
+    Vector3 _endPos;
 
-    private void Start()
+    void Start()
     {
         _way = GetComponent<LineRenderer>();
-        _player = PlayerController.singleton.transform;
-        _finish = Finish.singleton.transform;
-        zPos = new Vector3(_finish.position.x, 0.5f, _finish.position.z);
-        _way.SetPosition(1, zPos);
+        _player = PlayerController.Singleton.transform;        
+        _endPos = new Vector3(8f, 0.5f, 23f);
+        _way.SetPosition(1, _endPos);
     }
 
-    private void FixedUpdate()
+    void FixedUpdate()
     {
         UpdateLine();
     }
 
-    private void UpdateLine()
+    void UpdateLine()
     {
         _width = _player.localScale.x;
         Vector3 position = new Vector3(_player.position.x, 0.8f, _player.position.z + 0.05f);
         if (_player != null)
-        {            
+        {
+            if (Vector3.Distance(_player.position, _endPos) <= 2)
+            {
+                gameObject.SetActive(false);
+            }
             _way.startWidth = _width;
             _way.endWidth = _width;
             _way.SetPosition(0, position);

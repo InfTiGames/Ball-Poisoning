@@ -2,21 +2,19 @@ using UnityEngine;
 
 public class BulletController : MonoBehaviour
 {
-    public static BulletController singleton { get; private set; }
+    public static BulletController Singleton { get; private set; }
     [SerializeField] GameObject _hitFx;
     [SerializeField] GameObject _deathFx;
-
-
     float _explosionRadius;
 
     void Awake()
     {
-        singleton = this;
+        Singleton = this;
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.TryGetComponent(out EnemiesController enemy))
+        if (other.TryGetComponent(out ObstacleControl enemy))
         {
             Destroy(gameObject);            
         }
@@ -29,13 +27,13 @@ public class BulletController : MonoBehaviour
 
     void OnDestroy()
     {
-        _explosionRadius = transform.localScale.x/2 + 0.5f;
+        _explosionRadius = transform.localScale.x * 1.5f;
         Collider[] collider = Physics.OverlapSphere(transform.position, _explosionRadius);
         if (collider.Length > 0)
         {
             foreach (Collider col in collider)
             {
-                if (col.TryGetComponent(out EnemiesController enemiess))
+                if (col.TryGetComponent(out ObstacleControl enemiess))
                 {
                     DamageEnemy(enemiess.transform);                
                 }
@@ -49,7 +47,6 @@ public class BulletController : MonoBehaviour
         Destroy(fx, 1f);
         GameObject enemyDeathFx = Instantiate(_deathFx, enemy.position, Quaternion.identity);
         Destroy(enemyDeathFx, 1f);
-
         Destroy(enemy.gameObject);
     }
 }

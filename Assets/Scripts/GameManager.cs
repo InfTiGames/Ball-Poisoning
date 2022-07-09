@@ -3,17 +3,17 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public bool IsGameActive;
     [SerializeField] GameObject _gameOverPanel;
-    [SerializeField] GameObject _winGamePanel;   
+    [SerializeField] GameObject _winGamePanel;
     [SerializeField] GameObject _sizeBar;
     [SerializeField] GameObject _winFx;
+    public bool IsGameActive;
 
-    public static GameManager singleton { get; private set; }
+    public static GameManager Singleton { get; private set; }
 
     void Awake()
     {
-        singleton = this;
+        Singleton = this;
     }
 
     public void StartGame()
