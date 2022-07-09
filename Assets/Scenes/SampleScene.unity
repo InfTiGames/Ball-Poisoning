@@ -547,7 +547,7 @@ LineRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Positions:
-  - {x: 0, y: 0.5, z: 0.45}
+  - {x: 0, y: 0.8, z: 0.45}
   - {x: 10.4, y: 0.5, z: 30}
   m_Parameters:
     serializedVersion: 3
@@ -1307,7 +1307,6 @@ GameObject:
   - component: {fileID: 916704771}
   - component: {fileID: 916704770}
   - component: {fileID: 916704773}
-  - component: {fileID: 916704775}
   - component: {fileID: 916704774}
   m_Layer: 0
   m_Name: Sphere
@@ -1323,7 +1322,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 916704768}
-  m_LocalRotation: {x: 0, y: 0.16934954, z: 0, w: 0.98555607}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.8, z: 0.45}
   m_LocalScale: {x: 3.6, y: 3.6, z: 3.6}
   m_ConstrainProportionsScale: 0
@@ -1331,7 +1330,7 @@ Transform:
   - {fileID: 1444601364}
   m_Father: {fileID: 1958180630}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 19.5, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!135 &916704770
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1407,11 +1406,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b31703e59ecdda343a47f3002fe0d7bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SizeBar: {fileID: 2089415614}
+  _sizeBar: {fileID: 2089415614}
   _currentSize: 0
   _bulletPrefab: {fileID: 3952868608860404754, guid: 65db25133034f6d43a7ff912c4aea2b3, type: 3}
-  _finish: {fileID: 0}
   _bulletPosition: {fileID: 1444601364}
+  _obstacleMask:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!54 &916704774
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1428,26 +1429,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &916704775
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 916704768}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c04f2152b3f1664896150e8b5aab0c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  viewRadius: 8
-  viewAngle: 20
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 128
-  targets:
-    serializedVersion: 2
-    m_Bits: 64
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -2029,6 +2010,8 @@ MonoBehaviour:
   IsGameActive: 0
   _gameOverPanel: {fileID: 490637874}
   _winGamePanel: {fileID: 749765321}
+  _sizeBar: {fileID: 2089415612}
+  _winFx: {fileID: 7797039111988812883, guid: 0fc61b61c26abcf47a796cda8aef76a5, type: 3}
 --- !u!4 &1727559843
 Transform:
   m_ObjectHideFlags: 0
@@ -2037,7 +2020,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1727559841}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.98881984, y: 4.758856, z: 5.359723}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2323,6 +2306,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1958180630}
+  - component: {fileID: 1958180631}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -2346,6 +2330,26 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &1958180631
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1958180629}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 3f9cab3a79e9ec74a8bad319fd839eb7, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &1988290697
 GameObject:
   m_ObjectHideFlags: 0
@@ -2736,22 +2740,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 419acacc7d232244b9de0e3bbca14d64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slider: {fileID: 2089415615}
-  gradient:
+  _slider: {fileID: 2089415615}
+  _gradient:
     serializedVersion: 2
-    key0: {r: 1, g: 0.2971698, b: 0.2971698, a: 1}
+    key0: {r: 1, g: 0, b: 0, a: 1}
     key1: {r: 1, g: 0.93988997, b: 0.33725488, a: 1}
-    key2: {r: 0.74975705, g: 1, b: 0, a: 1}
-    key3: {r: 0.41773295, g: 1, b: 0, a: 0}
-    key4: {r: 0.41773295, g: 1, b: 0, a: 0}
+    key2: {r: 0.41773295, g: 1, b: 0, a: 1}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
     key5: {r: 0, g: 0, b: 0, a: 0}
     key6: {r: 0, g: 0, b: 0, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
     ctime0: 19661
     ctime1: 42598
     ctime2: 65535
-    ctime3: 65535
-    ctime4: 65535
+    ctime3: 0
+    ctime4: 0
     ctime5: 0
     ctime6: 0
     ctime7: 0
@@ -2766,7 +2770,7 @@ MonoBehaviour:
     m_Mode: 1
     m_NumColorKeys: 3
     m_NumAlphaKeys: 3
-  fill: {fileID: 257406094}
+  _fill: {fileID: 257406094}
 --- !u!114 &2089415615
 MonoBehaviour:
   m_ObjectHideFlags: 0

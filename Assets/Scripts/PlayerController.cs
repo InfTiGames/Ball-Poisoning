@@ -2,83 +2,91 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(SphereCollider))]
-
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController singleton { get; private set; }
-
-    //// Добавь звуки
-    //// Эффекты
     
-    ////// Пускай луч от шара до финиша проверяющий если нет на пути препядствий, тогда делай кнопку мигающей или эффектов добавь
-    ////// Переделай основную механику
+    //// Эффекты   
 
     // По коду сделай обджект пул, и адекватно используй синглтон
     // Рефакторинг
 
     //Небольшие анимации передвижения шарика, и анимация взрыва пули и смерти преград
 
-    public SizeBar SizeBar;
-    [SerializeField] private float _currentSize;
-    private static float _maxSize = 3.6f;  
+    [SerializeField] SizeBar _sizeBar;
+    [SerializeField] float _currentSize;
+    static float _maxSize = 3.6f;  
 
-    [SerializeField] private GameObject _bulletPrefab;
-    private GameObject _bullet;
-    public Transform _finish;
-    private Vector3 _scaleFactor = new Vector3(0.4f, 0.4f, 0.4f);
-    [SerializeField] private Transform _bulletPosition;
-    private bool _isClicked;    
-    private float _minimalSize = 1f;
+    [SerializeField] GameObject _bulletPrefab;
+    GameObject _bullet;
+    Transform _finish;
+    Vector3 _scaleFactor;
+    [SerializeField] Transform _bulletPosition;
+    bool _isClicked;    
+    float _minimalSize = 1f;      
+    [SerializeField] LayerMask _obstacleMask;
+    GameManager _gameManager;
 
-    float radius;
+    Animator _animator;
 
-
-    GameManager _gameManager;    
-
-    private void Awake()
+    void Awake()
     {
         singleton = this;
     }
 
-    private void Start()
+    void Start()
     {
+        _animator = GetComponentInParent<Animator>();
         _finish = Finish.singleton.transform;
         _gameManager = GameManager.singleton;
         _currentSize = _maxSize;
-        SizeBar.SetMaxSize(_maxSize);
+        _sizeBar.SetMaxSize(_maxSize);
         transform.rotation = Quaternion.LookRotation(_finish.position);
+        _scaleFactor = new Vector3(0.4f, 0.4f, 0.4f);
     }
 
-    private void FixedUpdate()
-    {
-        radius = transform.localScale.x;
+    void FixedUpdate()
+    {       
         if (_gameManager.IsGameActive == true)
         {
             if (_isClicked)
             {
                 GameChanges();
                 if (transform.localScale.x <= _minimalSize)
-                {
                     _gameManager.GameOver();
-                }             
             }
             else
             {
-                MoveBullet();                
-            }           
+                MoveBullet();
+                CheckIfWayIsClear();
+            }
         }
     }
 
-    private void GameChanges()
+    void CheckIfWayIsClear()
+    {
+        RaycastHit hit;
+        float radius = transform.localScale.x;
+        Vector3 position = new Vector3(transform.position.x, transform.position.y/2, transform.position.z);
+        if (!Physics.SphereCast(position, radius / 2, transform.forward, out hit, 4f, _obstacleMask))
+        {
+            MoveToFinish();
+        }
+        else
+        {
+            _animator.SetBool("Moving", false);
+        }
+    }
+
+    void GameChanges()
     {
         transform.localScale -= _scaleFactor / 2 * Time.fixedDeltaTime;
         _bullet.transform.localScale += _scaleFactor * Time.fixedDeltaTime;
         _currentSize -= _scaleFactor.x / 2 * Time.fixedDeltaTime;
-        SizeBar.SetSize(_currentSize);        
+        _sizeBar.SetSize(_currentSize);        
     }
 
-    private void MoveBullet()
+    void MoveBullet()
     {
         if (_bullet != null)
         {
@@ -86,36 +94,43 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void MoveToFinish()
+    void MoveToFinish()
     {
-        transform.position = Vector3.MoveTowards(transform.position, _finish.position, 5f * Time.fixedDeltaTime);    
+        transform.position = Vector3.MoveTowards(transform.position, _finish.position, 5f * Time.fixedDeltaTime);
+        _animator.SetBool("Moving", true);
+
+        if (Vector3.Distance(transform.position, _finish.position) <= 5f)
+        {
+
+        }
     }
 
-    private void OnMouseDown()
+    void OnMouseDown()
     {
         if (_bullet == null && _gameManager.IsGameActive == true)
         {
             _isClicked = true;
-            _bullet = Instantiate(_bulletPrefab, _bulletPosition.position, Quaternion.identity);
+            _bullet = Instantiate(_bulletPrefab, _bulletPosition.position, Quaternion.identity);            
         }
     }
 
-    private void OnMouseUp()
+    void OnMouseUp()
     {
         _isClicked = false;        
     }
 
-    private void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.TryGetComponent(out EnemiesController enemy))
         {
             gameObject.SetActive(false);
             _gameManager.GameOver();
+            return;
         }
-
         if (other.gameObject.TryGetComponent(out Finish door))
         {
             _gameManager.WinGame();
+            return;
         }
     }
 }

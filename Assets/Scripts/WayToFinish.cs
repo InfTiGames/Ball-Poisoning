@@ -2,12 +2,11 @@ using UnityEngine;
 
 public class WayToFinish : MonoBehaviour
 {
-    private Transform _player;
-    private Transform _finish;
+    Transform _player;
+    Transform _finish;
     LineRenderer _way;
     float _width;
     Vector3 zPos;
-
 
     private void Start()
     {
@@ -26,7 +25,7 @@ public class WayToFinish : MonoBehaviour
     private void UpdateLine()
     {
         _width = _player.localScale.x;
-        Vector3 position = new Vector3(_player.position.x, 0.5f, _player.position.z + 0.05f);
+        Vector3 position = new Vector3(_player.position.x, 0.8f, _player.position.z + 0.05f);
         if (_player != null)
         {            
             _way.startWidth = _width;

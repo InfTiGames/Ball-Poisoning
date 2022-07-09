@@ -3,20 +3,20 @@ using UnityEngine.UI;
 
 public class SizeBar : MonoBehaviour
 {
-    [SerializeField] private Slider slider;
-    [SerializeField] private Gradient gradient;
-    [SerializeField] private Image fill;
+    [SerializeField] Slider _slider;
+    [SerializeField] Gradient _gradient;
+    [SerializeField] Image _fill;
 
     public void SetMaxSize(float size)
     {
-        slider.maxValue = size;
-        slider.value = size;
-        fill.color = gradient.Evaluate(1f);
+        _slider.maxValue = size;
+        _slider.value = size;
+        _fill.color = _gradient.Evaluate(1f);
     }
 
     public void SetSize(float size)
     {
-        slider.value = size;
-        fill.color = gradient.Evaluate(slider.normalizedValue);
+        _slider.value = size;
+        _fill.color = _gradient.Evaluate(_slider.normalizedValue);
     }
 }

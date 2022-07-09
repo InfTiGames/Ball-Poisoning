@@ -4,26 +4,22 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public bool IsGameActive;
-    [SerializeField] private GameObject _gameOverPanel;
-    [SerializeField] private GameObject _winGamePanel;
-    private PlayerController _player;   
+    [SerializeField] GameObject _gameOverPanel;
+    [SerializeField] GameObject _winGamePanel;   
+    [SerializeField] GameObject _sizeBar;
+    [SerializeField] GameObject _winFx;
 
     public static GameManager singleton { get; private set; }
 
-    private void Awake()
+    void Awake()
     {
         singleton = this;
-    }
-
-    private void Start()
-    {
-        _player = PlayerController.singleton;
     }
 
     public void StartGame()
     {
         IsGameActive = true;    
-        _player.SizeBar.gameObject.SetActive(true);        
+        _sizeBar.gameObject.SetActive(true);        
     }
 
     public void GameOver()
@@ -35,13 +31,15 @@ public class GameManager : MonoBehaviour
     public void WinGame()
     {
         SetUI();
+        GameObject winFx = Instantiate(_winFx, _winFx.transform.position, Quaternion.identity);
+        Destroy(winFx, 1f);
         _winGamePanel.SetActive(true);
     }
 
-    private void SetUI()
+    void SetUI()
     {
         IsGameActive = false;
-        _player.SizeBar.gameObject.SetActive(false);       
+        _sizeBar.gameObject.SetActive(false);       
     }
 
     public void RestartGame()
